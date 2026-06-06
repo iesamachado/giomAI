@@ -15,7 +15,7 @@
             <li><a href="#inicio">Inicio</a></li>
             <li><a href="#inspiracion">Inspiración</a></li>
             <li><a href="#arquitectura">Arquitectura</a></li>
-            <li><a href="https://github.com/bernat13/giomAI" target="_blank" class="btn-outline">Ver en GitHub</a></li>
+            <li><a href="https://github.com/iesamachado/giomAI" target="_blank" class="btn-outline">Ver en GitHub</a></li>
         </ul>
     </nav>
 
@@ -40,24 +40,63 @@
         </div>
     </section>
 
-    <section id="arquitectura" class="section features">
+    <section id="arquitectura" class="section architecture-detailed">
         <div class="container">
-            <h2>Tecnología de <span>Vanguardia Local</span></h2>
-            <div class="cards">
+            <h2>Arquitectura: <span>El Cerebro y el Músculo</span></h2>
+            <p class="section-subtitle">Cómo distribuimos la carga de la Inteligencia Artificial de forma inteligente y segura dentro del IES Antonio Machado.</p>
+            
+            <div class="arch-grid">
+                <div class="arch-box">
+                    <div class="arch-icon">🧠</div>
+                    <h3>El Cerebro: Servidor Proxmox</h3>
+                    <p>El núcleo de GiomAI reside en un potente servidor central corriendo <strong>Proxmox</strong>. Aquí alojamos la "Máquina Virtual Cerebro", que actúa como el director de orquesta que atiende a los estudiantes.</p>
+                    <ul>
+                        <li><strong>La Interfaz (Open-WebUI):</strong> Es el entorno gráfico amigable (similar a ChatGPT) por donde acceden los alumnos desde el aula o sus casas a través de un túnel seguro.</li>
+                        <li><strong>El Balanceador (Nginx):</strong> Recibe miles de peticiones del alumnado y decide inteligentemente qué MiniPC está más libre para procesar cada frase en tiempo real.</li>
+                    </ul>
+                </div>
+
+                <div class="arch-box">
+                    <div class="arch-icon">💪</div>
+                    <h3>El Músculo: Enjambre de MiniPCs</h3>
+                    <p>El cálculo masivo de la Inteligencia Artificial no lo hace el servidor central, sino una red de <strong>MiniPCs de bajo coste</strong> que actúan coordinados como "obreros incansables".</p>
+                    <ul>
+                        <li><strong>Motor de IA (Ollama):</strong> Cada MiniPC físico ejecuta localmente su propia copia del modelo lingüístico.</li>
+                        <li><strong>Red Aislada (Foso):</strong> Operan en una subred física sin conexión a internet, garantizando que ningún dato introducido por un menor pueda filtrarse a la red.</li>
+                        <li><strong>Escalabilidad Infinita:</strong> Si se conectan más aulas a la vez, solo hay que enchufar más MiniPCs a la red para multiplicar la velocidad del sistema.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="cards" style="margin-top: 4rem;">
                 <div class="card">
                     <div class="icon">🔒</div>
                     <h3>Privacidad Absoluta</h3>
-                    <p>Los modelos se ejecutan en un entorno "foso" aislado de internet. Los datos e historiales de los alumnos nunca abandonan los servidores del instituto.</p>
+                    <p>Los datos y conversaciones de los estudiantes nunca abandonan los servidores físicos del instituto.</p>
                 </div>
                 <div class="card">
                     <div class="icon">⚖️</div>
-                    <h3>Balanceo Dinámico</h3>
-                    <p>Un nodo central en Proxmox distribuye inteligentemente las peticiones de inferencia entre múltiples MiniPCs, asegurando una respuesta fluida para toda la clase.</p>
+                    <h3>Cero Cuellos de Botella</h3>
+                    <p>El algoritmo envía la tarea al MiniPC con menos carga de trabajo en ese preciso milisegundo.</p>
                 </div>
                 <div class="card">
-                    <div class="icon">📈</div>
-                    <h3>Escalabilidad Infinita</h3>
-                    <p>Arquitectura basada en Nginx y Ollama que permite conectar nuevos MiniPCs físicos a la red en caliente, aumentando la potencia de cálculo según la demanda.</p>
+                    <div class="icon">♻️</div>
+                    <h3>Eficiencia y Reciclaje</h3>
+                    <p>Reutilizamos los MiniPCs antiguos y descartados del instituto, dándoles una segunda vida como potentes nodos de IA y reduciendo drásticamente la huella de carbono.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section highlight-banner">
+        <div class="container">
+            <div class="highlight-content">
+                <h2>El Secreto: <span>Micro-Inferencia Distribuida</span></h2>
+                <p class="highlight-lead">No necesitamos un superordenador de miles de euros para dar servicio a todo el instituto.</p>
+                <div class="highlight-text">
+                    <p>Un servidor con una GPU de alta gama puede generar 100 tokens por segundo, pero procesa las peticiones de forma secuencial, atascándose cuando 30 alumnos preguntan a la vez. Sin embargo, un MiniPC económico genera unos <strong>20 tokens/s</strong>, que equivale a la velocidad natural de lectura humana.</p>
+                    <p><strong>Nuestra magia radica en la paralelización y el reciclaje:</strong> En lugar de gastar el presupuesto en servidores prohibitivos, GiomAI aprovecha los <strong>MiniPCs antiguos que ya no se usan en el centro</strong>. Al instalarlos en red y orquestarlos con el balanceador de carga, sumamos su poder de cómputo.</p>
+                    <p>Si hay 10 aulas conectadas, el sistema deriva la carga hacia 10 de estos MiniPCs reciclados operando en paralelo. El resultado es un clúster de coste cero en hardware nuevo, capaz de dar servicio a cientos de alumnos sin cuellos de botella y transformando los equipos obsoletos del instituto en un motor de Inteligencia Artificial de vanguardia.</p>
                 </div>
             </div>
         </div>

@@ -107,7 +107,7 @@ Esta configuración prepara el script de enrutamiento para poder dar internet de
 
 Entra a la terminal de Proxmox como root y ejecuta:
 ```bash
-curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/setup_proxmox.sh | bash
+curl -sSL https://raw.githubusercontent.com/iesamachado/giomAI/main/setup_proxmox.sh | bash
 ```
 
 ### Fase 2: Máquina Virtual "Cerebro"
@@ -115,7 +115,7 @@ Esta VM (con dos tarjetas de red, conectada a `vmbr0` y `vmbr1`) alojará la web
 
 Dentro de la VM, ejecuta:
 ```bash
-curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/setup_vm.sh | bash
+curl -sSL https://raw.githubusercontent.com/iesamachado/giomAI/main/setup_vm.sh | bash
 ```
 
 **⚠️ Paso Manual Post-Instalación:** 
@@ -134,7 +134,7 @@ Los MiniPCs viven en el foso. Para configurarlos, hay que darles salida a intern
    ```
 2. En cada MiniPC, lanza el autoinstalador (instalará Ollama y descargará Llama 3.2):
    ```bash
-   curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/scripts_minipc/setup_minipc.sh | bash
+   curl -sSL https://raw.githubusercontent.com/iesamachado/giomAI/main/scripts_minipc/setup_minipc.sh | bash
    ```
 3. En Proxmox, vuelve a cerrar el foso por seguridad:
    ```bash
