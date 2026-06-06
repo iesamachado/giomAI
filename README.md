@@ -63,22 +63,22 @@ La arquitectura se divide en dos redes principales para garantizar un control to
 ```mermaid
 flowchart TD
     subgraph Internet
-        Alumno[🧑‍💻 Alumno\n(Casa / Aula)]
+        Alumno["🧑‍💻 Alumno\n(Casa / Aula)"]
     end
 
     subgraph "Servidor Host (Proxmox R740xd)"
         subgraph "Red General (vmbr0)"
-            Zrok[Zrok Tunnel\n(Punto de entrada seguro)]
-            WebUI[Open-WebUI\n(Interfaz y Chat)]
+            Zrok["Zrok Tunnel\n(Punto de entrada seguro)"]
+            WebUI["Open-WebUI\n(Interfaz y Chat)"]
         end
         
         subgraph "Red Aislada (vmbr1 - 10.0.50.x)"
-            Balancer[Nginx Load Balancer\n(10.0.50.2)]
+            Balancer["Nginx Load Balancer\n(10.0.50.2)"]
             
             subgraph "Nodos de Cómputo (MiniPCs físicos)"
-                Node1[MiniPC 1\nOllama (10.0.50.11)]
-                Node2[MiniPC 2\nOllama (10.0.50.12)]
-                NodeN[MiniPC N\nOllama (10.0.50.x)]
+                Node1["MiniPC 1\nOllama (10.0.50.11)"]
+                Node2["MiniPC 2\nOllama (10.0.50.12)"]
+                NodeN["MiniPC N\nOllama (10.0.50.x)"]
             end
         end
     end
