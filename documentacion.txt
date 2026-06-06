@@ -1,0 +1,151 @@
+Fase 1: El Servidor Host (Proxmox R740xd)
+El servidor Proxmox actuará como el "guardián" de la red. Por defecto, los MiniPCs estarán aislados, pero usarás estos scripts para darles internet momentáneamente cuando necesites instalar o actualizar modelos.
+
+1. Scripts de Control de Red (En Proxmox)
+Entra por SSH a Proxmox (como root) y crea estos dos archivos en una carpeta como /root/scripts_red/:
+
+abrir_internet.sh
+
+Bash
+#!/bin/bash
+# Habilita el reenvío de paquetes y enmascara el tráfico de la VLAN 10.0.50.x hacia internet (vmbr0)
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -t nat -A POSTROUTING -s '10.0.50.0/24' -o vmbr0 -j MASQUERADE
+echo "[+] Mantenimiento ABIERTO: Los MiniPCs tienen conexión a Internet."
+cerrar_internet.sh
+
+Bash
+#!/bin/bash
+# Elimina la regla de enmascaramiento, aislando de nuevo a los MiniPCs
+iptables -t nat -D POSTROUTING -s '10.0.50.0/24' -o vmbr0 -j MASQUERADE
+echo "[-] Mantenimiento CERRADO: Los MiniPCs vuelven a estar aislados en foso."
+Hazlos ejecutables con: chmod +x abrir_internet.sh cerrar_internet.sh
+
+Fase 2: Nodos de Cómputo (Los MiniPCs)
+Antes de ejecutar nada: Ejecuta ./abrir_internet.sh en Proxmox para que los MiniPCs puedan descargar los paquetes.
+
+Conéctate a cada MiniPC (que ya deben tener su IP estática asignada, ej. 10.0.50.11, 10.0.50.12) y ejecuta este script único.
+
+setup_minipc.sh
+
+Bash
+#!/bin/bash
+
+echo "1. Instalando Ollama..."
+curl -fsSL https://ollama.com/install.sh | sh
+
+echo "2. Configurando Ollama para escuchar en la red local..."
+sudo mkdir -p /etc/systemd/system/ollama.service.d
+sudo cat <<EOF > /etc/systemd/system/ollama.service.d/override.conf
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0:11434"
+EOF
+
+echo "3. Reiniciando el servicio..."
+sudo systemctl daemon-reload
+sudo systemctl restart ollama
+
+echo "4. Descargando modelo base (Ejemplo: Llama 3.2 de 3B)..."
+ollama pull llama3.2
+
+echo "Instalación completada. Este nodo está listo para recibir peticiones."
+Una vez que todos los MiniPCs tengan Ollama instalado y los modelos descargados, vuelve a Proxmox y ejecuta ./cerrar_internet.sh.
+
+Fase 3: La Máquina Virtual ("El Cerebro")
+Esta VM será la encargada de mostrar la web, mantener el contexto de los alumnos y repartir la carga sin que el tráfico salga de la red local.
+
+A. Recursos y Configuración de la VM en Proxmox
+Dado que esta máquina no hace inferencia de IA (solo sirve la web y rutea texto), no necesitas darle recursos masivos. El hardware pesado lo hacen los MiniPCs.
+
+CPU: 4 vCores (Tipo de procesador: host).
+
+RAM: 4 GB (8 GB si prevés que vas a tener decenas de alumnos simultáneos generando historiales de chat muy largos).
+
+Disco: 32 GB SSD (Open WebUI guarda bases de datos SQLite y perfiles de usuario, con esto vas sobrado).
+
+Red (CRÍTICO): * NIC 1 (net0): Conectado a vmbr0 (Red del instituto / DHCP / Salida a Internet para Zrok).
+
+NIC 2 (net1): Conectado a vmbr1 (Red aislada). Configúrala dentro del SO (ej. Ubuntu) con IP estática 10.0.50.2/24 y SIN Gateway.
+
+B. Despliegue de Servicios (Docker)
+Dentro de la VM, instala Docker y crea un directorio /opt/ai-cluster/. Necesitas dos archivos:
+
+1. nginx.conf (El Balanceador)
+
+Nginx
+events { 
+    worker_connections 1024; 
+}
+
+http {
+    upstream ollama_cluster {
+        # Algoritmo para enviar la petición al MiniPC con menos carga activa
+        least_conn; 
+        
+        # IPs de la subred aislada
+        server 10.0.50.11:11434;
+        server 10.0.50.12:11434;
+        # Añade los demás aquí...
+    }
+
+    server {
+        listen 11434;
+        location / {
+            proxy_pass http://ollama_cluster;
+            proxy_read_timeout 300;
+            proxy_connect_timeout 300;
+            proxy_send_timeout 300;
+        }
+    }
+}
+2. docker-compose.yml (La Infraestructura Web y Túnel)
+
+YAML
+version: '3.8'
+
+services:
+  nginx-balancer:
+    image: nginx:alpine
+    container_name: ai-load-balancer
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      # Apunta internamente al balanceador
+      - OPENAI_API_BASE_URLS=http://nginx-balancer:11434/v1
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on:
+      - nginx-balancer
+    restart: unless-stopped
+
+  zrok-tunnel:
+    image: openziti/zrok
+    container_name: zrok-tunnel
+    environment:
+      # Recuerda generar tu token en la web de zrok
+      - ZROK_ENABLE_TOKEN=TU_TOKEN_DE_ZROK_AQUI
+    command: share public http://open-webui:8080 --headless
+    depends_on:
+      - open-webui
+    restart: unless-stopped
+
+volumes:
+  open-webui-data:
+Para arrancar el cerebro, sitúate en /opt/ai-cluster/ y ejecuta docker compose up -d.
+
+Resumen del flujo de trabajo terminado
+El alumno entra desde su casa o el aula a https://tu-enlace.share.zrok.io.
+
+Zrok recibe la petición y la mete de forma segura al contenedor open-webui por la red general (vmbr0).
+
+Open WebUI lee el contexto del alumno y manda el prompt a nginx-balancer.
+
+Nginx busca qué MiniPC está más relajado en la subred 10.0.50.x a través de la segunda tarjeta de red de la VM (vmbr1).
+
+El MiniPC calcula la respuesta de forma aislada y la devuelve en la dirección opuesta. Todo seguro y sin exponer puertos al instituto.
+

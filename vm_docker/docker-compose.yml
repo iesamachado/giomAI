@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nginx-balancer:
+    image: nginx:alpine
+    container_name: ai-load-balancer
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    environment:
+      # Apunta internamente al balanceador
+      # Nota: A partir de la versión 0.1.24, Ollama soporta el endpoint de compatibilidad con OpenAI (/v1)
+      - OPENAI_API_BASE_URLS=http://nginx-balancer:11434/v1
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on:
+      - nginx-balancer
+    restart: unless-stopped
+
+  zrok-tunnel:
+    image: openziti/zrok
+    container_name: zrok-tunnel
+    environment:
+      # Recuerda generar tu token en la web de zrok
+      - ZROK_ENABLE_TOKEN=TU_TOKEN_DE_ZROK_AQUI
+    command: share public http://open-webui:8080 --headless
+    depends_on:
+      - open-webui
+    restart: unless-stopped
+
+volumes:
+  open-webui-data:
