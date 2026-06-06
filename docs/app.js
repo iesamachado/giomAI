@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Fade-in animation for elements
-    const fadeElements = document.querySelectorAll('.arch-box, .feature-card, .micro-content');
+    const fadeElements = document.querySelectorAll('.arch-box, .feature-card, .micro-content, .inspiration-image');
     
     const observerOptions = {
         threshold: 0.1,

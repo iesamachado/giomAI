@@ -198,11 +198,10 @@ h2 {
 
 .hero-art {
     position: absolute;
-    right: 10%;
+    right: 5%;
     top: 50%;
     transform: translateY(-50%);
-    width: 400px;
-    height: 600px;
+    width: 450px;
     z-index: 1;
     pointer-events: none;
     display: flex;
@@ -210,20 +209,14 @@ h2 {
     align-items: center;
 }
 
-.abstract-line {
-    position: absolute;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(to bottom, transparent, var(--border-color), transparent);
-}
-
-.abstract-circle {
-    position: absolute;
-    width: 300px;
-    height: 300px;
+.hero-image {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
-    border-radius: 50%;
-    opacity: 0.5;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    opacity: 0.9;
+    transition: transform 0.8s ease, opacity 0.8s ease;
 }
 
 /* Quote Section */
@@ -281,6 +274,42 @@ h2 {
 .inspiration-text strong {
     color: var(--text-primary);
     font-weight: 400;
+}
+
+.inspiration-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.inspiration-grid .quote-wrapper {
+    text-align: left;
+    margin-bottom: 3rem;
+}
+
+.inspiration-grid .quote-mark {
+    left: -1rem;
+    transform: none;
+}
+
+.inspiration-grid .inspiration-text {
+    text-align: left;
+}
+
+.inspiration-image img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transition: transform 0.4s ease, border-color 0.4s ease;
+}
+
+.inspiration-image img:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
 }
 
 /* Architecture Section */
@@ -458,6 +487,21 @@ footer p {
 
 /* Responsive */
 @media (max-width: 900px) {
+    .inspiration-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .inspiration-grid .quote-wrapper, 
+    .inspiration-grid .inspiration-text {
+        text-align: center;
+    }
+
+    .inspiration-grid .quote-mark {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
     .arch-grid {
         grid-template-columns: 1fr;
         gap: 5rem;
