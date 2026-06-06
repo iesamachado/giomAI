@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="GiomAI - El clúster de Inteligencia Artificial local y seguro para el IES Antonio Machado. Inspirando el futuro educativo.">
-    <title>GiomAI | IA para IES Antonio Machado</title>
+    <title>GiomAI | Literatura, Conocimiento e IA</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="noise-overlay"></div>
     <nav class="navbar">
         <div class="logo">Giom<span>AI</span></div>
         <ul class="nav-links">
@@ -21,89 +24,101 @@
 
     <header id="inicio" class="hero">
         <div class="hero-content">
-            <h1>La Inteligencia Artificial del <span>IES Antonio Machado</span></h1>
-            <p>Un clúster de inferencia local, privado y escalable diseñado para revolucionar el entorno educativo sin comprometer la seguridad de nuestros alumnos.</p>
-            <a href="#arquitectura" class="btn-primary">Descubrir el Proyecto</a>
+            <p class="hero-kicker">Proyecto Tecnológico • IES Antonio Machado</p>
+            <h1>La inteligencia artificial<br>que susurra a las aulas.</h1>
+            <p class="hero-description">Un clúster de inferencia local, privado y escalable diseñado para revolucionar el entorno educativo sin comprometer la intimidad de nuestro alumnado. Un puente entre la tecnología de vanguardia y la sabiduría humanista.</p>
+            <div class="hero-actions">
+                <a href="#arquitectura" class="btn-primary">Descubrir el Proyecto</a>
+            </div>
         </div>
-        <div class="hero-graphics">
-            <div class="orb"></div>
-            <div class="orb orb-2"></div>
+        <div class="hero-art">
+            <div class="abstract-line"></div>
+            <div class="abstract-circle"></div>
         </div>
     </header>
 
-    <section id="inspiracion" class="section glass-section">
+    <section id="inspiracion" class="section quote-section">
         <div class="container">
-            <h2>Nuestra Musa: <span>Guiomar</span></h2>
-            <p class="quote">"Tu poeta piensa en ti. La distancia es limón y ajenjo..."</p>
-            <p>Así como <strong>Guiomar</strong> fue la musa secreta e inspiradora en los últimos años del poeta <strong>Antonio Machado</strong>, <strong>GiomAI</strong> nace para ser la musa de nuestros estudiantes.</p> 
-            <p>Una inteligencia artificial diseñada no para reemplazar el aprendizaje, sino para iluminarlo, inspirar el pensamiento crítico y fomentar la creatividad en las aulas del IES Antonio Machado.</p>
+            <div class="quote-wrapper">
+                <span class="quote-mark">“</span>
+                <h2>Tu poeta piensa en ti. La distancia es limón y ajenjo...</h2>
+                <span class="quote-author">— Antonio Machado, a Guiomar</span>
+            </div>
+            <div class="inspiration-text">
+                <p>Así como <strong>Guiomar</strong> fue la musa secreta e inspiradora en los últimos años del poeta, <strong>GiomAI</strong> nace para ser la musa de nuestros estudiantes.</p> 
+                <p>Una inteligencia artificial diseñada no para reemplazar el aprendizaje, sino para iluminarlo, inspirar el pensamiento crítico y fomentar la creatividad en las aulas, entrelazando el rigor tecnológico con la esencia de la literatura.</p>
+            </div>
         </div>
     </section>
 
     <section id="arquitectura" class="section architecture-detailed">
         <div class="container">
-            <h2>Arquitectura: <span>El Cerebro y el Músculo</span></h2>
-            <p class="section-subtitle">Cómo distribuimos la carga de la Inteligencia Artificial de forma inteligente y segura dentro del IES Antonio Machado.</p>
+            <div class="section-header">
+                <h2>Arquitectura del sistema</h2>
+                <p class="section-subtitle">El equilibrio entre el cerebro centralizado y el músculo distribuido.</p>
+            </div>
             
             <div class="arch-grid">
                 <div class="arch-box">
-                    <div class="arch-icon">🧠</div>
+                    <div class="arch-number">01</div>
                     <h3>El Cerebro: Servidor Proxmox</h3>
-                    <p>El núcleo de GiomAI reside en un potente servidor central corriendo <strong>Proxmox</strong>. Aquí alojamos la "Máquina Virtual Cerebro", que actúa como el director de orquesta que atiende a los estudiantes.</p>
-                    <ul>
-                        <li><strong>La Interfaz (Open-WebUI):</strong> Es el entorno gráfico amigable (similar a ChatGPT) por donde acceden los alumnos desde el aula o sus casas a través de un túnel seguro.</li>
-                        <li><strong>El Balanceador (Nginx):</strong> Recibe miles de peticiones del alumnado y decide inteligentemente qué MiniPC está más libre para procesar cada frase en tiempo real.</li>
+                    <p>El núcleo de GiomAI reside en un servidor central. Aquí alojamos la «Máquina Virtual Cerebro», el director de orquesta que rige el flujo de conocimiento.</p>
+                    <ul class="elegant-list">
+                        <li><strong>La Interfaz (Open-WebUI):</strong> Un entorno sereno y amigable accesible mediante un túnel seguro.</li>
+                        <li><strong>El Balanceador (Nginx):</strong> Recibe las peticiones del alumnado y distribuye la carga como un caudal ordenado de información.</li>
                     </ul>
                 </div>
 
                 <div class="arch-box">
-                    <div class="arch-icon">💪</div>
+                    <div class="arch-number">02</div>
                     <h3>El Músculo: Enjambre de MiniPCs</h3>
-                    <p>El cálculo masivo de la Inteligencia Artificial no lo hace el servidor central, sino una red de <strong>MiniPCs de bajo coste</strong> que actúan coordinados como "obreros incansables".</p>
-                    <ul>
-                        <li><strong>Motor de IA (Ollama):</strong> Cada MiniPC físico ejecuta localmente su propia copia del modelo lingüístico.</li>
-                        <li><strong>Red Aislada (Foso):</strong> Operan en una subred física sin conexión a internet, garantizando que ningún dato introducido por un menor pueda filtrarse a la red.</li>
-                        <li><strong>Escalabilidad Infinita:</strong> Si se conectan más aulas a la vez, solo hay que enchufar más MiniPCs a la red para multiplicar la velocidad del sistema.</li>
+                    <p>El cálculo masivo no recae en un superordenador inaccesible, sino en una red de <strong>MiniPCs reciclados</strong> que actúan como obreros incansables del conocimiento.</p>
+                    <ul class="elegant-list">
+                        <li><strong>Motor de IA (Ollama):</strong> Cada MiniPC ejecuta localmente su propia copia del modelo lingüístico.</li>
+                        <li><strong>Red Aislada (Foso):</strong> Operan en una subred física sin conexión a internet, preservando la intimidad del estudiante.</li>
+                        <li><strong>Escalabilidad Infinita:</strong> La capacidad crece de forma orgánica al incorporar más hardware en desuso a la red.</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="cards" style="margin-top: 4rem;">
-                <div class="card">
-                    <div class="icon">🔒</div>
-                    <h3>Privacidad Absoluta</h3>
-                    <p>Los datos y conversaciones de los estudiantes nunca abandonan los servidores físicos del instituto.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-line"></div>
+                    <h3>Privacidad absoluta</h3>
+                    <p>Los datos y pensamientos de los estudiantes jamás abandonan los muros de nuestro instituto.</p>
                 </div>
-                <div class="card">
-                    <div class="icon">⚖️</div>
-                    <h3>Cero Cuellos de Botella</h3>
-                    <p>El algoritmo envía la tarea al MiniPC con menos carga de trabajo en ese preciso milisegundo.</p>
+                <div class="feature-card">
+                    <div class="feature-line"></div>
+                    <h3>Ausencia de esperas</h3>
+                    <p>El sistema asigna la reflexión al nodo con menor carga, garantizando una respuesta fluida y constante.</p>
                 </div>
-                <div class="card">
-                    <div class="icon">♻️</div>
-                    <h3>Eficiencia y Reciclaje</h3>
-                    <p>Reutilizamos los MiniPCs antiguos y descartados del instituto, dándoles una segunda vida como potentes nodos de IA y reduciendo drásticamente la huella de carbono.</p>
+                <div class="feature-card">
+                    <div class="feature-line"></div>
+                    <h3>Conciencia ecológica</h3>
+                    <p>Reutilizamos equipos obsoletos, otorgándoles una segunda vida noble como motores de inteligencia artificial.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section highlight-banner">
+    <section class="section micro-inference">
         <div class="container">
-            <div class="highlight-content">
-                <h2>El Secreto: <span>Micro-Inferencia Distribuida</span></h2>
-                <p class="highlight-lead">No necesitamos un superordenador de miles de euros para dar servicio a todo el instituto.</p>
-                <div class="highlight-text">
-                    <p>Un servidor con una GPU de alta gama puede generar 100 tokens por segundo, pero procesa las peticiones de forma secuencial, atascándose cuando 30 alumnos preguntan a la vez. Sin embargo, un MiniPC económico genera unos <strong>20 tokens/s</strong>, que equivale a la velocidad natural de lectura humana.</p>
-                    <p><strong>Nuestra magia radica en la paralelización y el reciclaje:</strong> En lugar de gastar el presupuesto en servidores prohibitivos, GiomAI aprovecha los <strong>MiniPCs antiguos que ya no se usan en el centro</strong>. Al instalarlos en red y orquestarlos con el balanceador de carga, sumamos su poder de cómputo.</p>
-                    <p>Si hay 10 aulas conectadas, el sistema deriva la carga hacia 10 de estos MiniPCs reciclados operando en paralelo. El resultado es un clúster de coste cero en hardware nuevo, capaz de dar servicio a cientos de alumnos sin cuellos de botella y transformando los equipos obsoletos del instituto en un motor de Inteligencia Artificial de vanguardia.</p>
+            <div class="micro-content">
+                <h2 class="micro-title">La poética de la micro-inferencia</h2>
+                <div class="micro-text">
+                    <p>La sabiduría no reside en la velocidad extrema, sino en el ritmo natural. Un servidor comercial procesa tareas de forma secuencial, atascándose ante peticiones simultáneas. Un equipo modesto, en cambio, genera en torno a <strong>20 palabras por segundo</strong> — el compás de la lectura humana.</p>
+                    <p>Nuestra innovación es la <em>paralelización</em>. Al unificar los <strong>equipos retirados del centro</strong> bajo un orquestador inteligente, sumamos sus capacidades. Diez aulas simultáneas encuentran respuesta en diez nodos trabajando al unísono.</p>
+                    <p>El resultado es un sistema sostenible, creado desde el aprovechamiento y el ingenio, capaz de democratizar la IA avanzada para cientos de alumnos sin requerir inversiones inasumibles.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2026 IES Antonio Machado - Proyecto GiomAI. Creado para la educación del futuro.</p>
+        <div class="footer-content">
+            <div class="footer-logo">Giom<span>AI</span></div>
+            <p>&copy; 2026 IES Antonio Machado<br>Un proyecto de pedagogía, tecnología y humanismo.</p>
+        </div>
     </footer>
 
     <script src="app.js"></script>

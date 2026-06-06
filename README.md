@@ -24,7 +24,7 @@ Bienvenido a la documentación oficial de **GiomAI**, un proyecto diseñado para
 ## 1. Visión General del Proyecto
 
 **GiomAI** busca aprovechar un servidor central potente y varios MiniPCs de bajo coste para crear un clúster de inferencia de IA. 
-El sistema permite que los alumnos accedan desde cualquier lugar mediante un túnel seguro (Zrok) a una interfaz amigable (Open-WebUI). Las peticiones se balancean dinámicamente hacia el MiniPC con menor carga en una red interna totalmente aislada.
+El sistema permite que el alumnado acceda desde cualquier lugar mediante un túnel seguro (Zrok) a una interfaz amigable (Open-WebUI). Las peticiones se balancean dinámicamente hacia el MiniPC con menor carga en una red interna totalmente aislada.
 
 **Puntos Clave:**
 - **Seguridad:** Los nodos de inferencia están en una red aislada sin salida a internet (Foso).
@@ -57,13 +57,13 @@ Son los "obreros" del sistema. Equipos pequeños y de bajo consumo que ejecutan 
 ## 3. Topología de Red y Arquitectura
 
 La arquitectura se divide en dos redes principales para garantizar un control total del tráfico:
-- **Red General (vmbr0):** Con salida a internet. Por aquí entra la conexión segura de los alumnos vía Zrok y sale el tráfico de Open-WebUI.
+- **Red General (vmbr0):** Con salida a internet. Por aquí entra la conexión segura del alumnado vía Zrok y sale el tráfico de Open-WebUI.
 - **Red Aislada (vmbr1 / VLAN 10.0.50.x):** Sin salida a internet (excepto cuando se abren los puertos por mantenimiento). Aquí viven los MiniPCs para evitar filtraciones y accesos no autorizados.
 
 ```mermaid
 flowchart TD
     subgraph Internet
-        Alumno["🧑‍💻 Alumno\n(Casa / Aula)"]
+        Alumno["🧑‍💻 Alumnado\n(Casa / Aula)"]
     end
 
     subgraph "Servidor Host (Proxmox R740xd)"
@@ -165,4 +165,4 @@ cd /opt/ai-cluster/
 # Ejemplo: ./manage_nodes.sh remove 10.0.50.11
 ```
 
-El script modifica la tabla de ruteo de Nginx y recarga la configuración en caliente de forma totalmente transparente para los alumnos que estén usando el chat en ese momento.
+El script modifica la tabla de ruteo de Nginx y recarga la configuración en caliente de forma totalmente transparente para el alumnado que esté usando el chat en ese momento.

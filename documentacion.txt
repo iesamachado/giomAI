@@ -52,14 +52,14 @@ echo "Instalación completada. Este nodo está listo para recibir peticiones."
 Una vez que todos los MiniPCs tengan Ollama instalado y los modelos descargados, vuelve a Proxmox y ejecuta ./cerrar_internet.sh.
 
 Fase 3: La Máquina Virtual ("El Cerebro")
-Esta VM será la encargada de mostrar la web, mantener el contexto de los alumnos y repartir la carga sin que el tráfico salga de la red local.
+Esta VM será la encargada de mostrar la web, mantener el contexto del alumnado y repartir la carga sin que el tráfico salga de la red local.
 
 A. Recursos y Configuración de la VM en Proxmox
 Dado que esta máquina no hace inferencia de IA (solo sirve la web y rutea texto), no necesitas darle recursos masivos. El hardware pesado lo hacen los MiniPCs.
 
 CPU: 4 vCores (Tipo de procesador: host).
 
-RAM: 4 GB (8 GB si prevés que vas a tener decenas de alumnos simultáneos generando historiales de chat muy largos).
+RAM: 4 GB (8 GB si prevés que vas a tener decenas de alumnas y alumnos simultáneos generando historiales de chat muy largos).
 
 Disco: 32 GB SSD (Open WebUI guarda bases de datos SQLite y perfiles de usuario, con esto vas sobrado).
 
@@ -139,11 +139,11 @@ volumes:
 Para arrancar el cerebro, sitúate en /opt/ai-cluster/ y ejecuta docker compose up -d.
 
 Resumen del flujo de trabajo terminado
-El alumno entra desde su casa o el aula a https://tu-enlace.share.zrok.io.
+El alumnado entra desde su casa o el aula a https://tu-enlace.share.zrok.io.
 
 Zrok recibe la petición y la mete de forma segura al contenedor open-webui por la red general (vmbr0).
 
-Open WebUI lee el contexto del alumno y manda el prompt a nginx-balancer.
+Open WebUI lee el contexto del alumnado y manda el prompt a nginx-balancer.
 
 Nginx busca qué MiniPC está más relajado en la subred 10.0.50.x a través de la segunda tarjeta de red de la VM (vmbr1).
 
