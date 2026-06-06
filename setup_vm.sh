@@ -15,7 +15,7 @@ sudo mkdir -p /opt/ai-cluster
 cd /opt/ai-cluster
 
 echo "3. Descargando configuraciones desde GitHub..."
-REPO_URL="https://raw.githubusercontent.com/bernat13/giomAI/main/vm_docker"
+REPO_URL="https://raw.githubusercontent.com/iesamachado/giomAI/main/vm_docker"
 
 sudo curl -O -s "${REPO_URL}/nginx.conf"
 sudo curl -O -s "${REPO_URL}/docker-compose.yml"

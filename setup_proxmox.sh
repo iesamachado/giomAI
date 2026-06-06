@@ -10,7 +10,7 @@ mkdir -p /root/scripts_red
 cd /root/scripts_red
 
 echo "2. Descargando los scripts desde GitHub..."
-REPO_URL="https://raw.githubusercontent.com/bernat13/giomAI/main/scripts_proxmox"
+REPO_URL="https://raw.githubusercontent.com/iesamachado/giomAI/main/scripts_proxmox"
 
 curl -O -s "${REPO_URL}/abrir_internet.sh"
 curl -O -s "${REPO_URL}/cerrar_internet.sh"
