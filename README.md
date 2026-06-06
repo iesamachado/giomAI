@@ -1,124 +1,168 @@
-# GiomAI - Despliegue de Clúster IA en Proxmox
+# 🧠 GiomAI - Infraestructura de Inteligencia Artificial Distribuida
 
-Este repositorio contiene todos los scripts y archivos de configuración necesarios para montar la infraestructura de IA distribuida. La arquitectura consta de un servidor Host (Proxmox), varios MiniPCs que actúan como Nodos de Cómputo (Ollama), y una Máquina Virtual que hace de "Cerebro" (Balanceador, Open-WebUI y Túnel Zrok).
+<div align="center">
+  <img src="assets/network_topology.png" alt="Topología Conceptual" width="80%">
+</div>
 
-## 🖥️ Características del Servidor Host
+Bienvenido a la documentación oficial de **GiomAI**, un proyecto diseñado para desplegar un clúster de Inteligencia Artificial local, escalable y seguro para entornos educativos (institutos).
 
-El núcleo de la infraestructura se ejecuta en un servidor **Dell PowerEdge R740xd**, un equipo de centro de datos diseñado para funcionar ininterrumpidamente y con una capacidad de virtualización excepcional.
+---
 
-### Especificaciones Principales (Configuración Actual)
+## 📖 Índice
+
+1. [Visión General del Proyecto](#1-visión-general-del-proyecto)
+2. [Características del Hardware](#2-características-del-hardware)
+3. [Topología de Red y Arquitectura](#3-topología-de-red-y-arquitectura)
+4. [Guía de Despliegue Rápido](#4-guía-de-despliegue-rápido)
+    - [Fase 1: Servidor Host (Proxmox)](#fase-1-servidor-host-proxmox)
+    - [Fase 2: Máquina Virtual "Cerebro"](#fase-2-máquina-virtual-cerebro)
+    - [Fase 3: Nodos de Cómputo (MiniPCs)](#fase-3-nodos-de-cómputo-minipcs)
+5. [Mantenimiento y Escalabilidad](#5-mantenimiento-y-escalabilidad)
+
+---
+
+## 1. Visión General del Proyecto
+
+**GiomAI** busca aprovechar un servidor central potente y varios MiniPCs de bajo coste para crear un clúster de inferencia de IA. 
+El sistema permite que los alumnos accedan desde cualquier lugar mediante un túnel seguro (Zrok) a una interfaz amigable (Open-WebUI). Las peticiones se balancean dinámicamente hacia el MiniPC con menor carga en una red interna totalmente aislada.
+
+**Puntos Clave:**
+- **Seguridad:** Los nodos de inferencia están en una red aislada sin salida a internet (Foso).
+- **Escalabilidad:** Se pueden añadir o quitar MiniPCs en caliente sin interrumpir el servicio.
+- **Privacidad:** Toda la inferencia y almacenamiento del historial se realiza de forma local en el instituto.
+
+---
+
+## 2. Características del Hardware
+
+### El Host Principal: Dell PowerEdge R740xd
+
+El núcleo de la infraestructura virtual se ejecuta en este servidor empresarial diseñado para funcionar ininterrumpidamente.
 
 | Componente | Detalle Técnico | Impacto en el Laboratorio (ASIR / IA) |
 | :--- | :--- | :--- |
-| **Modelo** | Dell PowerEdge R740xd | Chasis de 2U en rack. La "xd" (eXtreme Disk) indica que está optimizado para alta densidad de almacenamiento. |
-| **Procesadores (CPU)** | 2x Intel Xeon Gold 6138 | Arquitectura Skylake. 40 núcleos físicos y 80 hilos en total. Excelente para virtualización en Proxmox, pero al carecer de instrucciones AVX-512 VNNI, sufren en inferencia pura de IA comparado con una GPU. |
-| **Memoria RAM** | 128 GB DDR4 | Arquitectura NUMA (distribuida entre los dos procesadores). Capacidad masiva que permite cargar en memoria RAM modelos de lenguaje enormes (hasta 70B de parámetros). |
-| **Tarjetas de Red (NIC)** | Mínimo 2 interfaces (eno1, eno2) | Típicamente traen una tarjeta hija con 4 puertos a 1GbE o combinaciones de 10GbE. Perfecto para crear redes aisladas (VLANs/Fosos) a nivel físico sin saturar el bus principal. |
+| **Modelo** | Dell PowerEdge R740xd | Chasis de 2U en rack. Optimizado para alta densidad de almacenamiento. |
+| **CPU** | 2x Intel Xeon Gold 6138 | 40 núcleos físicos / 80 hilos. Excelente para virtualizar toda la red. |
+| **RAM** | 128 GB DDR4 (NUMA) | Capacidad masiva para máquinas virtuales y caché de base de datos. |
+| **Red (NIC)** | Mínimo 2 interfaces (1GbE/10GbE) | Permite separar físicamente la red pública de la red aislada de IA. |
 
-### Capacidades de Expansión (R740xd)
+*Nota sobre Expansión:* Cuenta con múltiples ranuras PCIe Gen3 libres para instalar gráficas NVIDIA en el futuro, doble fuente redundante para picos de consumo y iDRAC9 para gestión remota.
 
-Este equipo es una bestia diseñada para la escalabilidad. Si en el futuro necesitas ampliarlo, esto es lo que soporta el chasis de fábrica:
+### Los Nodos de Cómputo: MiniPCs
 
-* **Almacenamiento Masivo:** Dependiendo del *backplane* frontal, soporta hasta 24 discos de 2.5" (SAS/SATA/NVMe) o hasta 12 discos de 3.5". Cuenta con controladora RAID por hardware (línea PERC de Dell).
-* **Capacidad PCIe (Clave para IA):** Tiene múltiples ranuras PCIe Gen3 (hasta 8 ranuras dependiendo de los risers). Esto significa que puedes instalar varias tarjetas gráficas dedicadas (NVIDIA RTX o Tesla) en paralelo en el futuro.
-* **Fuentes de Alimentación (PSU):** Doble fuente redundante en caliente (Hot-Plug). Suelen ser de 750W, 1100W o 1600W. Si se instalan GPUs, las fuentes de 1100W en adelante son necesarias.
-* **Gestión Remota (iDRAC9):** Cuenta con un puerto de red dedicado y un chip controlador base para gestión *Out-of-Band*. Permite acceder a la BIOS, instalar sistemas operativos y monitorizar el hardware incluso si Proxmox está caído o el servidor está apagado.
+Son los "obreros" del sistema. Equipos pequeños y de bajo consumo que ejecutan el motor **Ollama** y procesan las peticiones enviadas por el balanceador. Si se necesita más potencia simultánea, simplemente se conectan más MiniPCs al switch de la red aislada.
 
 ---
 
-## 🚀 Proceso de Despliegue y Scripts
+## 3. Topología de Red y Arquitectura
 
-He estructurado la configuración en tres carpetas según la fase de despliegue:
+La arquitectura se divide en dos redes principales para garantizar un control total del tráfico:
+- **Red General (vmbr0):** Con salida a internet. Por aquí entra la conexión segura de los alumnos vía Zrok y sale el tráfico de Open-WebUI.
+- **Red Aislada (vmbr1 / VLAN 10.0.50.x):** Sin salida a internet (excepto cuando se abren los puertos por mantenimiento). Aquí viven los MiniPCs para evitar filtraciones y accesos no autorizados.
 
-### Fase 1: El Servidor Host (Proxmox)
-Ubicación: `/scripts_proxmox/`
+```mermaid
+flowchart TD
+    subgraph Internet
+        Alumno[🧑‍💻 Alumno\n(Casa / Aula)]
+    end
 
-Estos scripts se usan para abrir o cerrar el acceso a Internet a los MiniPCs que normalmente se encuentran en la subred aislada (ej. `10.0.50.0/24`).
+    subgraph "Servidor Host (Proxmox R740xd)"
+        subgraph "Red General (vmbr0)"
+            Zrok[Zrok Tunnel\n(Punto de entrada seguro)]
+            WebUI[Open-WebUI\n(Interfaz y Chat)]
+        end
+        
+        subgraph "Red Aislada (vmbr1 - 10.0.50.x)"
+            Balancer[Nginx Load Balancer\n(10.0.50.2)]
+            
+            subgraph "Nodos de Cómputo (MiniPCs físicos)"
+                Node1[MiniPC 1\nOllama (10.0.50.11)]
+                Node2[MiniPC 2\nOllama (10.0.50.12)]
+                NodeN[MiniPC N\nOllama (10.0.50.x)]
+            end
+        end
+    end
 
-*   **`abrir_internet.sh`**: Habilita el IP forwarding y enmascara el tráfico para que los MiniPCs tengan internet (necesario para instalar cosas).
-*   **`cerrar_internet.sh`**: Elimina las reglas de enmascaramiento, devolviendo a los MiniPCs a su aislamiento.
+    Alumno -- "https://...share.zrok.io" --> Zrok
+    Zrok -- "Tráfico HTTP (Pto 8080)" --> WebUI
+    WebUI -- "Prompts (API OpenAI)" --> Balancer
+    Balancer -- "Algoritmo: least_conn" --> Node1
+    Balancer -- "Algoritmo: least_conn" --> Node2
+    Balancer -- "Algoritmo: least_conn" --> NodeN
+```
 
-**Uso:** 
-1. Subir estos scripts a Proxmox (ej. en `/root/scripts_red/`).
-2. Darles permisos de ejecución: `chmod +x abrir_internet.sh cerrar_internet.sh`.
-
-### Fase 2: Nodos de Cómputo (Los MiniPCs)
-Ubicación: `/scripts_minipc/`
-
-Antes de ejecutar este script, asegúrate de haber ejecutado `abrir_internet.sh` en Proxmox.
-
-*   **`setup_minipc.sh`**: Instala Ollama, lo configura para que escuche peticiones en la red local (0.0.0.0:11434), reinicia el servicio y descarga el modelo base (`llama3.2`).
-
-> **💡 Corrección de Errores Aplicada:**
-> En la documentación original había un error en este script: 
-> `sudo cat <<EOF > /etc/systemd/system/ollama.service.d/override.conf`
-> La redirección de salida (`>`) se ejecuta con los permisos del usuario normal, lo cual daría un error de "Permiso denegado". Lo he corregido usando `tee` con sudo:
-> `cat <<EOF | sudo tee /etc/systemd/system/ollama.service.d/override.conf > /dev/null`
-
-**Uso:**
-Entrar a cada MiniPC y ejecutar: `bash setup_minipc.sh`. Una vez completado en todos los nodos, ejecutar `cerrar_internet.sh` en Proxmox.
-
-### Fase 3: La Máquina Virtual ("El Cerebro")
-Ubicación: `/vm_docker/`
-
-Esta máquina se encarga de balancear la carga entre los MiniPCs, servir la interfaz y exponer el servicio de forma segura.
-
-*   **`nginx.conf`**: Configura un proxy inverso con balanceo de carga `least_conn` que reparte las peticiones entre los MiniPCs disponibles en la subred aislada (10.0.50.11, 10.0.50.12, etc.).
-*   **`docker-compose.yml`**: Levanta Nginx (balanceador), Open-WebUI (interfaz) y Zrok (túnel para acceso desde el exterior).
-
-> **💡 Nota sobre Open-WebUI:**
-> Open-WebUI apunta al balanceador Nginx mediante la variable `OPENAI_API_BASE_URLS=http://nginx-balancer:11434/v1`. Ollama soporta el endpoint compatible con OpenAI (`/v1`) desde la versión 0.1.24, por lo que esta configuración funcionará perfectamente.
-> Recuerda cambiar `TU_TOKEN_DE_ZROK_AQUI` por tu token real de Zrok antes de lanzar los contenedores.
-
-**Uso:**
-1. Instalar Docker en la VM.
-2. Copiar los archivos `nginx.conf` y `docker-compose.yml` a `/opt/ai-cluster/`.
-3. Ejecutar `docker compose up -d`.
+*(También tienes disponible la vista técnica con IPs precisas generada como imagen estática)*
+<div align="center">
+  <img src="assets/esquema_red_sencillo.png" alt="Esquema de Red Técnico" width="90%">
+</div>
 
 ---
 
-## 🔄 Mantenimiento: Añadir o Quitar Nodos (MiniPCs)
+## 4. Guía de Despliegue Rápido
 
-Para escalar el clúster (añadir nuevos MiniPCs) o retirar nodos en mantenimiento sin interrumpir el servicio, he creado un script de gestión que actualiza el balanceador de carga en caliente.
+Todo el proyecto está automatizado mediante scripts públicos (`setup_*.sh`). Para levantar la infraestructura desde cero, sigue estos tres pasos en orden.
 
-### 1. Preparar el nuevo MiniPC (Solo si vas a añadir)
+### Fase 1: Servidor Host (Proxmox)
+Esta configuración prepara el script de enrutamiento para poder dar internet de forma puntual a los MiniPCs.
 
-Si vas a añadir un nodo nuevo, primero debes prepararlo usando el script de configuración que hicimos para los MiniPCs.
-1. En Proxmox, ejecuta `./scripts_proxmox/abrir_internet.sh` para dar salida a internet a la red aislada.
-2. En el nuevo MiniPC, ejecuta el script de configuración que dejará todo instalado y descargado:
-   ```bash
-   bash scripts_minipc/setup_minipc.sh
-   ```
-3. En Proxmox, ejecuta `./scripts_proxmox/cerrar_internet.sh` para volver a aislar la red.
-
-### 2. Actualizar el Clúster (En la Máquina Virtual "Cerebro")
-
-En la carpeta `/vm_docker/` de la Máquina Virtual, dispones del script `manage_nodes.sh`. Este script modifica automáticamente `nginx.conf` y recarga el balanceador sin interrumpir las peticiones actuales.
-
-**Añadir un nodo:**
+Entra a la terminal de Proxmox como root y ejecuta:
 ```bash
-chmod +x manage_nodes.sh
-./manage_nodes.sh add <IP_DEL_NUEVO_NODO>
+curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/setup_proxmox.sh | bash
+```
+
+### Fase 2: Máquina Virtual "Cerebro"
+Esta VM (con dos tarjetas de red, conectada a `vmbr0` y `vmbr1`) alojará la web, el túnel y el balanceador de carga.
+
+Dentro de la VM, ejecuta:
+```bash
+curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/setup_vm.sh | bash
+```
+
+**⚠️ Paso Manual Post-Instalación:** 
+Edita el archivo `/opt/ai-cluster/docker-compose.yml` para introducir tu token real de Zrok. Luego, lanza el servicio:
+```bash
+cd /opt/ai-cluster/
+docker compose up -d
+```
+
+### Fase 3: Nodos de Cómputo (MiniPCs)
+Los MiniPCs viven en el foso. Para configurarlos, hay que darles salida a internet momentáneamente.
+
+1. En Proxmox, abre el foso: 
+   ```bash
+   /root/scripts_red/abrir_internet.sh
+   ```
+2. En cada MiniPC, lanza el autoinstalador (instalará Ollama y descargará Llama 3.2):
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/bernat13/giomAI/main/scripts_minipc/setup_minipc.sh | bash
+   ```
+3. En Proxmox, vuelve a cerrar el foso por seguridad:
+   ```bash
+   /root/scripts_red/cerrar_internet.sh
+   ```
+
+---
+
+## 5. Mantenimiento y Escalabilidad
+
+El clúster está diseñado para la Alta Disponibilidad (High Availability). Puedes añadir o quitar potencia sin cortar el servicio.
+
+Si vas a añadir un nuevo nodo, prepáralo primero siguiendo la **Fase 3** (abrir foso > ejecutar script de minipc > cerrar foso).
+
+Una vez que el nodo está operativo (o si necesitas dar de baja temporalmente uno para repararlo), usa el gestor integrado en la Máquina Virtual Cerebro:
+
+**Añadir un nodo al balanceador:**
+```bash
+cd /opt/ai-cluster/
+./manage_nodes.sh add <IP_DEL_NODO>
 # Ejemplo: ./manage_nodes.sh add 10.0.50.13
 ```
 
-**Quitar un nodo:**
+**Quitar un nodo del balanceador:**
 ```bash
+cd /opt/ai-cluster/
 ./manage_nodes.sh remove <IP_DEL_NODO>
 # Ejemplo: ./manage_nodes.sh remove 10.0.50.11
 ```
 
-El script se encarga de:
-- Modificar la lista de balanceo de carga en `nginx.conf`.
-- Comprobar si el contenedor `ai-load-balancer` está corriendo.
-- Ejecutar un `nginx -s reload` dentro del contenedor para aplicar los cambios instantáneamente sin corte de servicio.
-
----
-
-## 🎯 Resumen del Flujo de Trabajo
-
-1. El alumno accede a `https://tu-enlace.share.zrok.io`.
-2. Zrok redirige de forma segura la petición al contenedor `open-webui` por la red general (vmbr0).
-3. Open-WebUI envía el prompt al balanceador `nginx-balancer`.
-4. Nginx evalúa qué MiniPC tiene menos carga activa (red aislada vmbr1, subred 10.0.50.x) y le pasa la solicitud.
-5. El MiniPC genera la respuesta de forma segura y aislada, enviándola de vuelta al alumno. Todo ello sin abrir puertos públicos en el instituto.
+El script modifica la tabla de ruteo de Nginx y recarga la configuración en caliente de forma totalmente transparente para los alumnos que estén usando el chat en ese momento.
